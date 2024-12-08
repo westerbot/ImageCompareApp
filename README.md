@@ -1,8 +1,11 @@
-# React + Vite
+# Image Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple web app for viewing local images. Features:
 
-Currently, two official plugins are available:
+- Drag and drop to reorder images in sidebar
+- Keyboard shortcuts (1-9) to select images
+- Hover or click thumbnails to view full images
+- Remove individual images with the X button
+- Images remain in their original HDD locations (no uploading)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Built with Vite, React, Tailwind and Lucide.
