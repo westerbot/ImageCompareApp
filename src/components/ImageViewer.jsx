@@ -8,9 +8,13 @@ const ImageViewer = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [swipingIndex, setSwipingIndex] = useState(null);
+  const [sidebarWidth, setSidebarWidth] = useState(20); // percentage
   const fileInputRef = useRef(null);
+  const sidebarRef = useRef(null);
+  const resizerRef = useRef(null);
+  const isDraggingRef = useRef(false);
 
-  const isMobile = window.innerWidth <= 1000;
+  const isMobile = window.innerWidth <= 768;
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -20,9 +24,38 @@ const ImageViewer = () => {
       }
     };
 
+    const handleMouseMove = (e) => {
+      if (!isDraggingRef.current) return;
+      
+      const containerWidth = sidebarRef.current.parentElement.offsetWidth;
+      const newWidth = (e.clientX / containerWidth) * 100;
+      
+      // Limit the sidebar width between 10% and 50%
+      setSidebarWidth(Math.min(Math.max(newWidth, 10), 50));
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      document.body.style.cursor = 'default';
+      document.body.style.userSelect = 'auto';
+    };
+
     window.addEventListener('keypress', handleKeyPress);
-    return () => window.removeEventListener('keypress', handleKeyPress);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('keypress', handleKeyPress);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
   }, [selectedImages]);
+
+  const handleResizerMouseDown = (e) => {
+    isDraggingRef.current = true;
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   const handleFileSelect = async (event) => {
     let files;
@@ -139,8 +172,12 @@ const ImageViewer = () => {
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
-      {/* Sidebar - wider on mobile */}
-      <div className={`${isMobile ? 'w-1/3' : 'w-1/5'} flex-shrink-0 bg-gray-100 p-4 flex flex-col h-full`}>
+      {/* Sidebar with resizable width */}
+      <div 
+        ref={sidebarRef}
+        className={`${isMobile ? 'w-1/3' : ''} flex-shrink-0 bg-gray-100 p-4 flex flex-col h-full relative`}
+        style={!isMobile ? { width: `${sidebarWidth}%` } : undefined}
+      >
         <div className="flex-grow overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
           {selectedImages.map((imageUrl, index) => (
             <div 
@@ -181,6 +218,16 @@ const ImageViewer = () => {
             </div>
           ))}
         </div>
+        {/* Resizer handle */}
+        {!isMobile && (
+          <div
+            ref={resizerRef}
+            className="absolute right-0 top-0 bottom-0 w-1 bg-transparent hover:bg-blue-500 cursor-ew-resize group"
+            onMouseDown={handleResizerMouseDown}
+          >
+            <div className="absolute right-0 h-full w-1 bg-gray-300 group-hover:bg-blue-500 transition-colors" />
+          </div>
+        )}
         <div className="mt-4 flex-shrink-0">
           <input
             type="file"
