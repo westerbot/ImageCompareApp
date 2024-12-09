@@ -87,15 +87,6 @@ const ImageViewer = () => {
     if (isMobile) {
       try {
         const pickerOpts = {
-          types: [
-            {
-              description: 'Images',
-              accept: {
-                'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-              }
-            },
-          ],
-          excludeAcceptAllOption: false,
           multiple: true
         };
         
@@ -195,7 +186,7 @@ const ImageViewer = () => {
             type="file"
             ref={fileInputRef}
             onChange={handleFileSelect}
-            accept="image/*"
+            accept="*/*"
             multiple
             className="hidden"
           />
